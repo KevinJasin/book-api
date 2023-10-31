@@ -8,10 +8,11 @@ const prisma = new PrismaClient();
 
 
 
-app.get("/books", async (rquest, response) => {
+app.get("/books", async (request, response) => {
     try {
         const books = await prisma.books.findMany();
-    response.status(200).json(books);
+        console.log(books)
+        response.status(200).json(books);
     } catch (error) {
         response.status(404).send({
             message: "Midagi on katki",
@@ -24,30 +25,52 @@ app.get("/books", async (rquest, response) => {
 
 app.get("/books/:id", async (request, response) => {
 
-    console.log(typeof request.params.id),
+    const book = await prisma.books.findUnique({
+
+        where: {
+            id: Number(request.params.id),
+        },
+    });
+
+    console.log(book)
 
     try {
-
+        
         const book = await prisma.books.findUnique({
 
             where: {
                 id: Number(request.params.id),
             },
         });
-    
-    
 
-
-response.status(200).json(book);
-} catch (error) {
-    response.status(404).send({
-        message: "Midagi on katki",
-        error,
-    });
-}
+        console.log(book)
+    
+        response.status(200).json(book);
+    } catch (error) {
+        response.status(404).send({
+            message: "Midagi on katki",
+            error,
+        });
+    }
 });
 
 
+
+app.post("/books", async (request, response) => {
+    try {
+        const newBook = await prisma.books.create({
+            data: { ...request.body },
+        });
+
+        response.status(200).json(newBook);
+
+    } catch (error) {
+        response.status(404).send({
+            message: "Midagi on katki",
+            error,
+        });
+    }
+});
 
 
 
@@ -75,7 +98,7 @@ app.delete("/books/:id", async (request, response) => {
 
 
 app.listen(PORT, () => {
-    console.log("Server listening at port ${PORT}");
+    console.log(`Server listening at port ${PORT}`);
 });
 
 
