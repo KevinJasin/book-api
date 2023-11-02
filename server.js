@@ -8,6 +8,9 @@ const prisma = new PrismaClient();
 
 
 
+app.use(express.json());
+
+
 app.get("/books", async (request, response) => {
     try {
         const books = await prisma.books.findMany();
@@ -24,15 +27,6 @@ app.get("/books", async (request, response) => {
 
 
 app.get("/books/:id", async (request, response) => {
-
-    const book = await prisma.books.findUnique({
-
-        where: {
-            id: Number(request.params.id),
-        },
-    });
-
-    console.log(book)
 
     try {
         
@@ -57,6 +51,24 @@ app.get("/books/:id", async (request, response) => {
 
 
 app.post("/books", async (request, response) => {
+    try {
+        const newBook = await prisma.books.create({
+            data: { ...request.body },
+        });
+
+        response.status(200).json(newBook);
+
+    } catch (error) {
+        response.status(404).send({
+            message: "Midagi on katki",
+            error,
+        });
+    }
+});
+
+
+
+app.put("/books", async (request, response) => {
     try {
         const newBook = await prisma.books.create({
             data: { ...request.body },
